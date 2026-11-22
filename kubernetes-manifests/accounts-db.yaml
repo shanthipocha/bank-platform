@@ -104,6 +104,14 @@ spec:
               subPath: postgres
       serviceAccount: bank-of-anthos
       serviceAccountName: default
-      volumes:
-        - emptyDir: {}
-          name: postgresdb
+      # volumes:
+      #   - emptyDir: {}
+      #     name: postgresdb
+  volumeClaimTemplates:
+    - metadata:
+        name: postgresdb
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
