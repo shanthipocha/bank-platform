@@ -100,6 +100,7 @@ spec:
             - containerPort: 5432
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
             capabilities:
               drop: ["ALL"]
           resources:
@@ -113,8 +114,17 @@ spec:
             - mountPath: /var/lib/postgresql/data
               name: postgresdb
               subPath: postgres
+            - mountPath: /var/run/postgresql
+              name: run-postgresql
+            - mountPath: /tmp
+              name: tmp
       serviceAccount: bank-of-anthos
       serviceAccountName: default
+      volumes:
+        - emptyDir: {}
+          name: run-postgresql
+        - emptyDir: {}
+          name: tmp
   volumeClaimTemplates:
     - metadata:
         name: postgresdb
