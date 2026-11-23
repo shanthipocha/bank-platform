@@ -14,19 +14,21 @@
 
 apiVersion: v1
 data:
-  ACCOUNTS_DB_URI: postgresql://accounts-admin:accounts-pwd@accounts-db:5432/accounts-db
-  POSTGRES_DB: accounts-db
-  POSTGRES_PASSWORD: accounts-pwd
-  POSTGRES_USER: accounts-admin
+  POSTGRES_DB: postgresdb
+  POSTGRES_PASSWORD: password
+  POSTGRES_USER: admin
+  SPRING_DATASOURCE_PASSWORD: password
+  SPRING_DATASOURCE_URL: jdbc:postgresql://ledger-db:5432/postgresdb
+  SPRING_DATASOURCE_USERNAME: admin
 kind: ConfigMap
 metadata:
   labels:
-    app: accounts-db
+    app: ledger-db
     application: bank-of-anthos
     environment: development
-    team: accounts
+    team: ledger
     tier: db
-  name: accounts-db-config
+  name: ledger-db-config
 ---
 apiVersion: v1
 kind: Service
@@ -34,20 +36,19 @@ metadata:
   labels:
     application: bank-of-anthos
     environment: development
-    team: accounts
+    team: ledger
     tier: db
-  name: accounts-db
+  name: ledger-db
 spec:
   ports:
     - name: tcp
       port: 5432
-      protocol: TCP
       targetPort: 5432
   selector:
-    app: accounts-db
+    app: ledger-db
     application: bank-of-anthos
     environment: development
-    team: accounts
+    team: ledger
     tier: db
   type: ClusterIP
 ---
@@ -57,26 +58,26 @@ metadata:
   labels:
     application: bank-of-anthos
     environment: development
-    team: accounts
+    team: ledger
     tier: db
-  name: accounts-db
+  name: ledger-db
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: accounts-db
+      app: ledger-db
       application: bank-of-anthos
       environment: development
-      team: accounts
+      team: ledger
       tier: db
-  serviceName: accounts-db
+  serviceName: ledger-db
   template:
     metadata:
       labels:
-        app: accounts-db
+        app: ledger-db
         application: bank-of-anthos
         environment: development
-        team: accounts
+        team: ledger
         tier: db
     spec:
       securityContext:
@@ -91,30 +92,40 @@ spec:
             - configMapRef:
                 name: environment-config
             - configMapRef:
-                name: accounts-db-config
+                name: ledger-db-config
             - configMapRef:
                 name: demo-data-config
-          image: us-central1-docker.pkg.dev/bank-of-anthos-ci/bank-of-anthos/accounts-db:v0.6.11@sha256:e86d6533bcd05bf9e4d7d495bf03b0a5ca571f526f3a419572b6df2c7913d588
-          name: accounts-db
+          image: us-central1-docker.pkg.dev/bank-of-anthos-ci/bank-of-anthos/ledger-db:v0.6.11@sha256:b434822c3122bc3f4681741fc863c02f7bb2f476b0d6b307e2282b49d896c3dd
+          name: postgres
           ports:
             - containerPort: 5432
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
             capabilities:
               drop: ["ALL"]
           resources:
             limits:
               cpu: 250m
-              memory: 512Mi
+              memory: 1Gi
             requests:
               cpu: 100m
-              memory: 128Mi
+              memory: 512Mi
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgresdb
               subPath: postgres
+            - mountPath: /var/run/postgresql
+              name: run-postgresql
+            - mountPath: /tmp
+              name: tmp
       serviceAccount: bank-of-anthos
       serviceAccountName: default
+      volumes:
+        - emptyDir: {}
+          name: run-postgresql
+        - emptyDir: {}
+          name: tmp
   volumeClaimTemplates:
     - metadata:
         name: postgresdb
