@@ -80,6 +80,13 @@ spec:
         team: ledger
         tier: db
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 70
+        runAsGroup: 70
+        fsGroup: 70
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - envFrom:
             - configMapRef:
@@ -92,6 +99,10 @@ spec:
           name: postgres
           ports:
             - containerPort: 5432
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           resources:
             limits:
               cpu: 250m
@@ -105,9 +116,6 @@ spec:
               subPath: postgres
       serviceAccount: bank-of-anthos
       serviceAccountName: default
-      # volumes:
-      #   - emptyDir: {}
-      #     name: postgresdb
   volumeClaimTemplates:
     - metadata:
         name: postgresdb
