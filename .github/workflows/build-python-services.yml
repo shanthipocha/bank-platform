@@ -1,14 +1,20 @@
-name: build-frontend
+name: build-python-services
 on:
   push:
     branches: [main]
     paths:
       - 'src/frontend/**'
-      - '.github/workflows/build-frontend.yml'
+      - 'src/accounts/userservice/**'
+      - 'src/accounts/contacts/**'
+      - 'src/loadgenerator/**'
+      - '.github/workflows/build-python-services.yml'
   pull_request:
     paths:
       - 'src/frontend/**'
-      - '.github/workflows/build-frontend.yml'
+      - 'src/accounts/userservice/**'
+      - 'src/accounts/contacts/**'
+      - 'src/loadgenerator/**'
+      - '.github/workflows/build-python-services.yml'
 
 permissions:
   contents: read
@@ -19,14 +25,26 @@ jobs:
     permissions:
       contents: read
       packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: frontend
+            context: src/frontend
+          - name: userservice
+            context: src/accounts/userservice
+          - name: contacts
+            context: src/accounts/contacts
+          - name: loadgenerator
+            context: src/loadgenerator
     env:
-      IMAGE: ghcr.io/${{ github.repository }}/frontend
+      IMAGE: ghcr.io/${{ github.repository }}/${{ matrix.name }}
       TAG: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v7
 
       - name: Build image
-        run: docker build -t "$IMAGE:$TAG" src/frontend
+        run: docker build -t "$IMAGE:$TAG" ${{ matrix.context }}
 
       - name: Trivy report (HIGH and CRITICAL, informational)
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
