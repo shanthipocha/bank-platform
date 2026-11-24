@@ -32,3 +32,15 @@
 - Test: new writes survive pod deletion for both DBs
 - Observed: balancereader/transactionhistory take a few minutes to recover after a DB restart (blank balance/history meanwhile)
 - Improvement ideas: startup/readiness tuning, DB connection retry, DB replica
+
+## Frontend image hardening
+- Before: 31 HIGH/CRITICAL (3 CRITICAL). After: 1 HIGH (zlib1g, no fix in base yet)
+- Fixes: base image digest update, uv.lock bump (certifi, pyasn1), pip removed from final image
+- Lesson: pinned digests are reproducible but go stale; pip vendors its own libraries
+- Accepted: zlib1g (revisit when base image updates)
+- Known: Dockerfile pulls uv from ghcr.io/astral-sh/uv:latest (unpinned)
+
+## Pipeline gate (frontend)
+- build-frontend: build, Trivy report (HIGH+CRITICAL), Trivy gate (fail on fixable CRITICAL), push only on main
+- Verified: PR #4 with an old lockfile failed at the gate and skipped the push
+- Accepted: zlib1g HIGH (no fix in base image yet)
