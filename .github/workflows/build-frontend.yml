@@ -28,13 +28,22 @@ jobs:
       - name: Build image
         run: docker build -t "$IMAGE:$TAG" src/frontend
 
-      - name: Trivy image scan (report-only)
+      - name: Trivy report (HIGH and CRITICAL, informational)
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: ${{ env.IMAGE }}:${{ env.TAG }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           exit-code: '0'
+          format: table
+
+      - name: Trivy gate (fail on fixable CRITICAL)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ env.IMAGE }}:${{ env.TAG }}
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
           format: table
 
       - name: Log in to GHCR
