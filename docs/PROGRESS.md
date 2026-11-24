@@ -26,3 +26,9 @@
 - Known harmless log: chmod on /var/run/postgresql "Operation not permitted" (image startup script, fsGroup already makes it writable)
 - Accepted: DEMO_LOGIN_PASSWORD (public demo credential)
 - Remaining: move DB passwords into Secrets, including the copy inside ACCOUNTS_DB_URI
+
+## Verified: database hardening
+- ledger-db and accounts-db: non-root (uid 70), readOnlyRootFilesystem, PVC-backed
+- Test: new writes survive pod deletion for both DBs
+- Observed: balancereader/transactionhistory take a few minutes to recover after a DB restart (blank balance/history meanwhile)
+- Improvement ideas: startup/readiness tuning, DB connection retry, DB replica
