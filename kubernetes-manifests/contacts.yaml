@@ -77,6 +77,8 @@ spec:
                 name: environment-config
             - configMapRef:
                 name: accounts-db-config
+            - secretRef:
+                name: accounts-db-secret
           image: ghcr.io/shanthipocha/bank-platform/contacts:b35f93ef05bac173213ccd33a0d9324854dccb74
           name: contacts
           readinessProbe:

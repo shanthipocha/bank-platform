@@ -87,6 +87,8 @@ spec:
                 name: service-api-config
             - configMapRef:
                 name: ledger-db-config
+            - secretRef:
+                name: ledger-db-secret
           image: ghcr.io/shanthipocha/bank-platform/ledgerwriter:3b4b56fd01424018a92483ec5c612aa9d2b117d8
           name: ledgerwriter
           readinessProbe:

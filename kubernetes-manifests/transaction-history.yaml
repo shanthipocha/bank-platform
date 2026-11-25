@@ -93,6 +93,8 @@ spec:
                 name: environment-config
             - configMapRef:
                 name: ledger-db-config
+            - secretRef:
+                name: ledger-db-secret
           image: ghcr.io/shanthipocha/bank-platform/transactionhistory:3b4b56fd01424018a92483ec5c612aa9d2b117d8
           livenessProbe:
             httpGet:
