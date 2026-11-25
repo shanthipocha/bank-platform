@@ -113,3 +113,12 @@ Sections marked (from summary) came from an earlier session and were not re-veri
 - Frontend: `kubectl port-forward svc/frontend 8081:80`, then open http://localhost:8081
 - Latest Java CI run: `gh run list --workflow=build-java-services.yml --limit 1`
 - Image tags in GHCR: `gh api "/user/packages/container/bank-platform%2F<svc>/versions" --jq '.[0].metadata.container.tags[0]'`
+
+## 9. Update: DB passwords moved to Secrets (2026-11-25)
+- Created `ledger-db-secret` (POSTGRES_PASSWORD, SPRING_DATASOURCE_PASSWORD) and `accounts-db-secret` (POSTGRES_PASSWORD, ACCOUNTS_DB_URI) on the kind cluster only. Not committed.
+- Manifests add `secretRef` next to the DB `configMapRef` in 7 workloads; password keys removed from ConfigMaps.
+- Passwords unchanged (data is on PVCs). Rotate later via the secret manager.
+- Verified: pods healthy, login, history, payment all work.
+- On a fresh cluster the Secrets must exist first, or pods fail with CreateContainerConfigError. Cloud phase: External Secrets Operator or cloud secret manager.
+- `DEMO_LOGIN_PASSWORD` left in config.yaml on purpose (public demo login).
+- Known issues #1 (plaintext passwords) is now resolved for DB credentials.
