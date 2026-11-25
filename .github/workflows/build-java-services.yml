@@ -1,18 +1,20 @@
-name: build-balancereader
+name: build-java-services
 on:
   push:
     branches: [main]
     paths:
-      - 'src/ledger/balancereader/**'
+      - 'src/ledger/**'
       - 'pom.xml'
       - '.mvn/**'
-      - '.github/workflows/build-balancereader.yml'
+      - '.trivyignore'
+      - '.github/workflows/build-java-services.yml'
   pull_request:
     paths:
-      - 'src/ledger/balancereader/**'
+      - 'src/ledger/**'
       - 'pom.xml'
       - '.mvn/**'
-      - '.github/workflows/build-balancereader.yml'
+      - '.trivyignore'
+      - '.github/workflows/build-java-services.yml'
 
 permissions:
   contents: read
@@ -23,8 +25,12 @@ jobs:
     permissions:
       contents: read
       packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [balancereader, ledgerwriter, transactionhistory]
     env:
-      IMAGE: ghcr.io/${{ github.repository }}/balancereader
+      IMAGE: ghcr.io/${{ github.repository }}/${{ matrix.service }}
       TAG: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v7
@@ -38,20 +44,29 @@ jobs:
       - name: Code style and unit tests
         run: |
           chmod +x mvnw
-          ./mvnw -B -pl src/ledger/balancereader -am checkstyle:check test
+          ./mvnw -B -pl src/ledger/${{ matrix.service }} -am checkstyle:check test
 
       - name: Build image with Jib
         run: |
-          ./mvnw -B -pl src/ledger/balancereader -am compile \
+          ./mvnw -B -pl src/ledger/${{ matrix.service }} -am compile \
             jib:dockerBuild -Djib.to.image="$IMAGE:$TAG"
 
-      - name: Trivy image scan (report-only)
+      - name: Trivy report (HIGH and CRITICAL, informational)
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: ${{ env.IMAGE }}:${{ env.TAG }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           exit-code: '0'
+          format: table
+
+      - name: Trivy gate (fail on fixable CRITICAL)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ env.IMAGE }}:${{ env.TAG }}
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
           format: table
 
       - name: Log in to GHCR
