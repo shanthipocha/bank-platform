@@ -1,0 +1,10 @@
+# Accepted risk: Spring Framework 6.2.x (spring-webmvc 6.2.19), applies to
+# balancereader, ledgerwriter, transactionhistory.
+# Open-source fix exists only in Spring 7.0.x (needs Spring Boot 4 migration).
+# Revisit when migrating to Boot 4. Expiry forces a re-review.
+
+# RCE via XsltView path limitation. Services do not use XSLT views.
+CVE-2026-47884 exp:2027-03-01
+
+# SSE stream corruption with views. Services do not use SSE.
+CVE-2026-47890 exp:2027-03-01

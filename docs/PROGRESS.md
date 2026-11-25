@@ -44,3 +44,8 @@
 - build-frontend: build, Trivy report (HIGH+CRITICAL), Trivy gate (fail on fixable CRITICAL), push only on main
 - Verified: PR #4 with an old lockfile failed at the gate and skipped the push
 - Accepted: zlib1g HIGH (no fix in base image yet)
+
+## CI status
+- Python services (frontend, userservice, contacts, loadgenerator): matrix build, scan, gate on fixable CRITICAL, push to GHCR by commit SHA
+- Accepted: zlib1g HIGH (no fix in base yet)
+- Incident: Push image failed once for userservice/contacts, passed on re-run (cause unconfirmed; likely transient)
