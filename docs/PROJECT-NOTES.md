@@ -131,3 +131,10 @@ Sections marked (from summary) came from an earlier session and were not re-veri
 - Fresh EBS volume is root-owned, so initdb fails with chmod error. Fix: `PGDATA=/var/lib/postgresql/data/pgdata` on both DB StatefulSets (live patch only; use Kustomize overlay per cloud later).
 - Result: all 9 pods Running; login, history, payment and deposit verified through the AWS load balancer.
 - Cleanup order before destroy: delete frontend svc, delete PVCs, wait for ELB and EBS to disappear, then `terraform destroy`.
+
+## 11. AWS session closed (2026-11-26)
+- terraform destroy: 56 resources destroyed, no clusters left in ap-south-1.
+- Rebuild needs: terraform apply, then gp3 StorageClass, secrets (ledger-db, accounts-db, jwt-key), PGDATA fix on both DB StatefulSets.
+- To automate before the next AWS apply: Kustomize overlay for EKS, secrets script, console access entry in Terraform.
+- AWS credits expire Dec 1, 2026.
+- Next: monitoring on kind (Prometheus, Grafana, Alertmanager to Slack, Loki, AIOps bot).
