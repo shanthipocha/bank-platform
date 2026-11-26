@@ -1,0 +1,41 @@
+# Small footprint for kind on WSL2. Same file works on EKS/GKE/AKS (override per cloud later).
+fullnameOverride: kps
+
+# kind does not expose these control-plane endpoints, so scraping them only creates false alerts
+kubeEtcd:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+kubeProxy:
+  enabled: false
+
+# node-exporter often fails on kind/WSL (mount propagation). Re-enable on real clouds.
+nodeExporter:
+  enabled: false
+
+prometheus:
+  prometheusSpec:
+    retention: 2d
+    resources:
+      requests: { cpu: 100m, memory: 400Mi }
+      limits: { memory: 900Mi }
+    # find ServiceMonitors/rules in all namespaces, not just those with the Helm release label
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests: { cpu: 10m, memory: 50Mi }
+      limits: { memory: 128Mi }
+
+grafana:
+  resources:
+    requests: { cpu: 50m, memory: 128Mi }
+    limits: { memory: 512Mi }
+  sidecar:
+    dashboards:
+      enabled: true
