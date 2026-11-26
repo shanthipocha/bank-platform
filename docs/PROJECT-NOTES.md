@@ -122,3 +122,12 @@ Sections marked (from summary) came from an earlier session and were not re-veri
 - On a fresh cluster the Secrets must exist first, or pods fail with CreateContainerConfigError. Cloud phase: External Secrets Operator or cloud secret manager.
 - `DEMO_LOGIN_PASSWORD` left in config.yaml on purpose (public demo login).
 - Known issues #1 (plaintext passwords) is now resolved for DB credentials.
+
+## 10. AWS EKS phase (2026-11-26)
+- Terraform in `infra/aws` (VPC, EKS 1.34, managed node group, EBS CSI addon), region ap-south-1. 56 resources.
+- Free-plan accounts: t3.medium is not allowed. Node group hung in CREATING with no instances. Fix: `m7i-flex.large`. Check `aws ec2 describe-instance-types --filters Name=free-tier-eligible,Values=true`.
+- An interrupted apply leaves an orphan node group in AWS that is not in state. Delete it with `aws eks delete-nodegroup`.
+- EKS needs: default `gp3` StorageClass (EBS CSI), `jwt-key` secret (RSA keypair), `ledger-db-secret`, `accounts-db-secret`.
+- Fresh EBS volume is root-owned, so initdb fails with chmod error. Fix: `PGDATA=/var/lib/postgresql/data/pgdata` on both DB StatefulSets (live patch only; use Kustomize overlay per cloud later).
+- Result: all 9 pods Running; login, history, payment and deposit verified through the AWS load balancer.
+- Cleanup order before destroy: delete frontend svc, delete PVCs, wait for ELB and EBS to disappear, then `terraform destroy`.
