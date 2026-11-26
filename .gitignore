@@ -220,3 +220,4 @@ gha-creds-*.json
 *.tfstate.*
 *.tfvars
 crash.log
+tfplan
