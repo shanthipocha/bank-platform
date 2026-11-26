@@ -37,6 +37,7 @@ spec:
               valueFrom: { secretKeyRef: { name: alertmanager-slack, key: critical-url } }
             - name: WARN_URL
               valueFrom: { secretKeyRef: { name: alertmanager-slack, key: warning-url } }
+          envFrom: [{ secretRef: { name: aiops-llm, optional: true } }]
           ports: [{ containerPort: 8080 }]
           volumeMounts: [{ name: code, mountPath: /app }]
           securityContext:
