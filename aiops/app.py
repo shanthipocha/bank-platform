@@ -99,9 +99,9 @@ def analyse(alert):
     except Exception as e:
         lines.append(f"_Loki query failed: {e}_")
     lines.append("*Hint:* " + HINTS.get(l.get("alertname"), "No runbook hint for this alert yet."))
-    text = "\n".join(x for x in lines if x)[:2900]
+    text = "\n".join(x for x in lines if x)[:2200]
     ai = explain(text)
-    return text + ("\n\n*AI analysis:*\n" + ai if ai else "")
+    return text + ("\n\n*AI analysis:*\n" + ai[:1500] if ai else "")
 
 def post_slack(severity, text):
     url = os.environ["CRIT_URL"] if severity == "critical" else os.environ["WARN_URL"]

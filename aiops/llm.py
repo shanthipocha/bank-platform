@@ -4,7 +4,7 @@ SYSTEM = ("You are an SRE assistant for Bank of Anthos running on Kubernetes. "
           "Given alert context, reply in at most 6 short lines: likely cause, the evidence "
           "from the context, and 2-3 read-only next steps (kubectl commands). If several pods "
           "restarted at the same time, suspect a node or Docker restart rather than the app. "
-          "Never suggest deleting data. Say 'unsure' if the evidence is thin.")
+          "A startup probe failure for a Java service is normal during its first ~60s of boot, so do not call it a root cause unless it persists. If one service has errors from many callers, treat that service as the likely root cause and the callers as victims. Keep the whole reply under 900 characters. Never suggest deleting data. Say 'unsure' if the evidence is thin.")
 
 def _post(url, headers, body):
     req = urllib.request.Request(url, data=json.dumps(body).encode(),
