@@ -21,7 +21,7 @@ spec:
       securityContext: { runAsNonRoot: true, runAsUser: 10001, seccompProfile: { type: RuntimeDefault } }
       containers:
         - name: aiops-chat
-          image: ghcr.io/shanthipocha/bank-platform/aiops-chat:local
+          image: ghcr.io/shanthipocha/bank-platform/aiops-chat:f658b1125488ce9f0348f70c9bec7215aea964f0
           imagePullPolicy: IfNotPresent
           envFrom:
             - secretRef: { name: aiops-chat-slack }
