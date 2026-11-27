@@ -29,7 +29,7 @@ def explain(context):
         if provider == "openai":  # Ollama, Gemini, Groq, any OpenAI-compatible API
             base = os.environ["LLM_BASE_URL"].rstrip("/")
             r = _post(base + "/chat/completions", {"Authorization": "Bearer " + key},
-                      {"model": model, "max_tokens": 1200,
+                      {"model": model, "max_tokens": 2000, "reasoning_effort": "low",
                        "messages": [{"role": "system", "content": SYSTEM},
                                     {"role": "user", "content": context}]})
             return r["choices"][0]["message"]["content"].strip()
