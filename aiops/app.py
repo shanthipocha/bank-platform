@@ -52,6 +52,28 @@ def logs(ns, name):
             continue
     return "(no logs available)"
 
+
+LOKI = os.environ.get("LOKI_URL", "http://loki.monitoring.svc:3100")
+
+def loki_errors(ns):
+    q = urllib.parse.urlencode({
+        "query": '{namespace="%s"} |~ "(?i)error|exception|refused|timed out"' % ns,
+        "since": "10m", "limit": "200", "direction": "backward"})
+    with urllib.request.urlopen(f"{LOKI}/loki/api/v1/query_range?{q}", timeout=10) as r:
+        streams = json.loads(r.read().decode())["data"]["result"]
+    counts, samples = {}, {}
+    for st in streams:
+        app = st["stream"].get("app", st["stream"].get("pod", "?"))
+        for _, line in st["values"]:
+            counts[app] = counts.get(app, 0) + 1
+            samples.setdefault(app, line[:160])
+    if not counts:
+        return "No error lines in Loki for the last 10 minutes."
+    out = ["Errors in the last 10 min (per service): " +
+           ", ".join(f"{a}={n}" for a, n in sorted(counts.items(), key=lambda x: -x[1]))]
+    out += [f"- {a}: {samples[a]}" for a in list(counts)[:4]]
+    return "\n".join(out)
+
 def analyse(alert):
     l, a = alert["labels"], alert.get("annotations", {})
     ns = l.get("namespace", "default")
@@ -72,6 +94,10 @@ def analyse(alert):
                 lines.append("Recent logs:\n```" + logs(ns, p["metadata"]["name"]) + "```")
         except Exception as e:
             lines.append(f"_Context collection failed: {e}_")
+    try:
+        lines.append("Cross-service errors (Loki):\n```" + loki_errors(ns) + "```")
+    except Exception as e:
+        lines.append(f"_Loki query failed: {e}_")
     lines.append("*Hint:* " + HINTS.get(l.get("alertname"), "No runbook hint for this alert yet."))
     text = "\n".join(x for x in lines if x)[:2900]
     ai = explain(text)
