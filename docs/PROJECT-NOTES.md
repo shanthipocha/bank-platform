@@ -147,3 +147,9 @@ Sections marked (from summary) came from an earlier session and were not re-veri
 - Destroyed: 58 resources. AWS credits expire Dec 1.
 - Webhook URLs were printed on screen once: rotate in Slack if screens/screenshots were shared.
 - Next: Loki on kind (then ELK/EFK to compare), AIOps using Loki, Slack chat bot (aiops-chat, Socket Mode, image built in CI), then GKE and AKS.
+
+## 13. Final EKS session: logs and chatbot (2026-11-27)
+- EKS cluster creation took over 30 minutes and Terraform timed out. The cluster was ACTIVE in AWS. Fix: `terraform untaint 'module.eks.aws_eks_cluster.this[0]'`, then plan and apply (11 resources).
+- CloudWatch observability addon: its auto-instrumentation injected 4 OpenTelemetry init containers into app pods. That caused ephemeral-storage evictions and OOMKills in contacts and userservice. Setting `manager.applicationSignals.autoMonitor.monitorAllServices=false` was accepted, but we removed the addon before testing it. Delete CloudWatch log groups by hand after destroy.
+- Logs on EKS: Loki + Alloy (same files as kind). Chatbot aiops-chat deployed on EKS (kind bot scaled to 0, because Slack delivers events to one process per app token).
+- Terraform: CloudWatch addon removed from main.tf.
