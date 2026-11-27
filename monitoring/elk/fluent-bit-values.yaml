@@ -1,0 +1,25 @@
+env:
+  - name: ES_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: elasticsearch-es-elastic-user
+        key: elastic
+resources:
+  requests: { cpu: 50m, memory: 64Mi }
+  limits: { memory: 150Mi }
+config:
+  outputs: |
+    [OUTPUT]
+        Name                es
+        Match               kube.*
+        Host                elasticsearch-es-http.logging.svc
+        Port                9200
+        HTTP_User           elastic
+        HTTP_Passwd         ${ES_PASSWORD}
+        tls                 On
+        tls.verify          Off
+        Suppress_Type_Name  On
+        Logstash_Format     On
+        Logstash_Prefix     bank-logs
+        Replace_Dots        On
+        Retry_Limit         False
