@@ -23,3 +23,9 @@ variable "node_count" {
   type    = number
   default = 2
 }
+
+# IAM principal used in the AWS console (root or a user). Gives read-only view in the EKS console.
+variable "console_principal_arn" {
+  type    = string
+  default = ""
+}

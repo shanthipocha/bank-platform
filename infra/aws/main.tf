@@ -41,15 +41,27 @@ module "eks" {
   cluster_endpoint_public_access           = true
   enable_cluster_creator_admin_permissions = true
 
+  access_entries = var.console_principal_arn == "" ? {} : {
+    console = {
+      principal_arn = var.console_principal_arn
+      policy_associations = {
+        view = {
+          policy_arn   = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminViewPolicy"
+          access_scope = { type = "cluster" }
+        }
+      }
+    }
+  }
+
   eks_managed_node_groups = {
     default = {
       instance_types = [var.node_instance_type]
       iam_role_additional_policies = {
         ebs_csi = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
       }
-      min_size       = 1
-      max_size       = 3
-      desired_size   = var.node_count
+      min_size     = 1
+      max_size     = 3
+      desired_size = var.node_count
     }
   }
 }
