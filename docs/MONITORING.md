@@ -64,3 +64,11 @@ CPUThrottlingHigh is noisy on kind. No logs/traces backend yet (Loki, Tempo). AI
 - Kibana 500 errors were Elasticsearch restarting after OOMKill, not a query problem.
 - WSL memory raised to 9GB via .wslconfig for the ELK session. Revert afterwards.
 - ECK owns the Kibana Deployment: scale it with `count` in the CR, not `kubectl scale`.
+
+## Slack chat bot (aiops-chat)
+- Code: `aiops-chat/` (app.py Socket Mode listener, common.py collector and Loki query, llm.py copied from aiops/). Image built by `.github/workflows/build-aiops-chat.yml` and pushed to GHCR by SHA.
+- Needs Slack app tokens in Secret `aiops-chat-slack` (SLACK_APP_TOKEN xapp-, SLACK_BOT_TOKEN xoxb-), never in git. Slack app: Socket Mode on, bot scopes app_mentions:read, chat:write, channels:history, event app_mention.
+- Uses the same `aiops-llm` Secret as the alert assistant, and the read-only `aiops-read` Role (ns default).
+- Usage: `@alertmanager why is balancereader restarting?` in #bank-ops. Replies in thread with context and AI analysis.
+- Loki context appears only while Loki is installed.
+- Keep `llm.py` in aiops/ and aiops-chat/ in sync (two copies).
