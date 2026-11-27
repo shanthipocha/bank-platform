@@ -44,3 +44,11 @@ Free tier used so far: Gemini via the OpenAI-compatible endpoint (`gemini-2.5-fl
 
 ## Known gaps
 CPUThrottlingHigh is noisy on kind. No logs/traces backend yet (Loki, Tempo). AIOps is read-only; no auto-remediation. Webhook is unauthenticated inside the cluster (add a NetworkPolicy).
+
+## Logs (Loki + Alloy, kind)
+- `monitoring/logging/`: loki-values.yaml (single binary, filesystem, 48h retention), alloy-values.yaml (tails pod logs, labels namespace/pod/container/app), loki-datasource.yaml (Grafana sidecar picks it up).
+- Query in Grafana Explore: `{namespace="default", app="balancereader"}`; errors: `{namespace="default"} |= "ERROR"`.
+- Alloy tails only new lines after it starts; a quiet service shows nothing until it logs.
+- AIOps queries Loki (10 min window, error regex) and adds per-service error counts to the alert context.
+- Aiops LLM call uses `reasoning_effort: low` and `max_tokens: 2000` (Gemini 2.5 Flash spends hidden tokens; lower values truncated replies).
+- Local port 8080 is taken on this machine: use 8081/8082/3001 for port-forwards.
