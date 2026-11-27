@@ -1,0 +1,11 @@
+# Applied after kube-prometheus-values.yaml on EKS.
+# Node-exporter works on real nodes. etcd/scheduler/controller-manager stay off:
+# EKS manages the control plane and does not expose those endpoints.
+nodeExporter:
+  enabled: true
+prometheus:
+  prometheusSpec:
+    retention: 1d
+    resources:
+      requests: { cpu: 200m, memory: 600Mi }
+      limits: { memory: 1500Mi }
