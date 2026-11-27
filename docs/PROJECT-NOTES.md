@@ -138,3 +138,12 @@ Sections marked (from summary) came from an earlier session and were not re-veri
 - To automate before the next AWS apply: Kustomize overlay for EKS, secrets script, console access entry in Terraform.
 - AWS credits expire Dec 1, 2026.
 - Next: monitoring on kind (Prometheus, Grafana, Alertmanager to Slack, Loki, AIOps bot).
+
+## 12. Final AWS session with monitoring (2026-11-27)
+- Rebuild via automation: terraform apply (58 resources incl. console access entry), update-kubeconfig, scripts/create-secrets.sh bank-eks, kubectl apply -k deploy/overlays/eks. All 9 pods Running first try, no manual fixes.
+- Monitoring on EKS: kube-prometheus-stack with kube-prometheus-values + values-eks + alertmanager-values; bank-alerts.yaml; aiops deployed.
+- Verified on AWS: app via ELB (login, payment, deposit, transfer), Grafana dashboards, Slack severity routing, BankDatabaseDown alert, AIOps context and Gemini AI analysis, RESOLVED message.
+- Cleanup order: helm uninstall kps, delete aiops, delete PVCs, delete -k overlay, wait for ELB/EBS to vanish, terraform destroy (do NOT pipe destroy through tail: it hides the confirmation prompt).
+- Destroyed: 58 resources. AWS credits expire Dec 1.
+- Webhook URLs were printed on screen once: rotate in Slack if screens/screenshots were shared.
+- Next: Loki on kind (then ELK/EFK to compare), AIOps using Loki, Slack chat bot (aiops-chat, Socket Mode, image built in CI), then GKE and AKS.
