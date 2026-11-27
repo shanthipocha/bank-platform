@@ -52,3 +52,15 @@ CPUThrottlingHigh is noisy on kind. No logs/traces backend yet (Loki, Tempo). AI
 - AIOps queries Loki (10 min window, error regex) and adds per-service error counts to the alert context.
 - Aiops LLM call uses `reasoning_effort: low` and `max_tokens: 2000` (Gemini 2.5 Flash spends hidden tokens; lower values truncated replies).
 - Local port 8080 is taken on this machine: use 8081/8082/3001 for port-forwards.
+
+## Logs: Loki vs ELK (tested on kind, 2026-11-27)
+| | Loki + Alloy | ELK (ECK + Fluent Bit) |
+|---|---|---|
+| Memory | about 0.7 GB | about 2.5 GB, ES OOMKilled at 1Gi limit until raised to 1536Mi with 768m heap |
+| Setup | 2 Helm charts | ECK operator, CRDs, Elasticsearch + Kibana, Fluent Bit, auth secret |
+| Query | LogQL, label first | KQL, full text, rich fields |
+| UI | Grafana, shared with metrics | Kibana, separate |
+- ELK files: `monitoring/elk/` (elastic-stack.yaml, fluent-bit-values.yaml). Index pattern `bank-logs-*`, field `kubernetes.labels.app`.
+- Kibana 500 errors were Elasticsearch restarting after OOMKill, not a query problem.
+- WSL memory raised to 9GB via .wslconfig for the ELK session. Revert afterwards.
+- ECK owns the Kibana Deployment: scale it with `count` in the CR, not `kubectl scale`.
