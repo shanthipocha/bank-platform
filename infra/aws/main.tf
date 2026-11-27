@@ -35,7 +35,8 @@ module "eks" {
   subnet_ids = module.vpc.private_subnets
 
   cluster_addons = {
-    aws-ebs-csi-driver = { most_recent = true }
+    aws-ebs-csi-driver              = { most_recent = true }
+    amazon-cloudwatch-observability = { most_recent = true }
   }
 
   cluster_endpoint_public_access           = true
@@ -57,7 +58,8 @@ module "eks" {
     default = {
       instance_types = [var.node_instance_type]
       iam_role_additional_policies = {
-        ebs_csi = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+        ebs_csi    = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+        cloudwatch = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
       }
       min_size     = 1
       max_size     = 3
