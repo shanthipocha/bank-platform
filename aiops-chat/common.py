@@ -23,6 +23,16 @@ def pods_for(ns, target):
     return [p for p in items
             if p["metadata"]["name"] == target or p["metadata"]["name"].startswith(target + "-")]
 
+
+def age_of(p):
+    import calendar
+    t = p["status"].get("startTime") or p["metadata"].get("creationTimestamp")
+    try:
+        secs = int(time.time() - calendar.timegm(time.strptime(t, "%Y-%m-%dT%H:%M:%SZ")))
+    except Exception:
+        return "?"
+    return f"{secs}s" if secs < 600 else f"{secs // 60}m" if secs < 7200 else f"{secs // 3600}h"
+
 def pod_summary(p):
     name = p["metadata"]["name"]
     statuses = p["status"].get("containerStatuses", [])
@@ -33,7 +43,7 @@ def pod_summary(p):
         state = next(iter(c["state"]))
         reason = c["state"][state].get("reason", "")
         last = c.get("lastState", {}).get("terminated", {}).get("reason", "-")
-        out.append(f"{name}/{c['name']}: {state} {reason} ready={c['ready']} restarts={c['restartCount']} lastExit={last}")
+        out.append(f"{name}/{c['name']}: {state} {reason} ready={c['ready']} restarts={c['restartCount']} lastExit={last} age={age_of(p)}")
     return out
 
 def events(ns, name):
