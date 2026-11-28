@@ -46,7 +46,7 @@ spec:
               value: "5"
             - name: LOG_LEVEL
               value: error
-          image: ghcr.io/shanthipocha/bank-platform/loadgenerator:b35f93ef05bac173213ccd33a0d9324854dccb74
+          image: ghcr.io/shanthipocha/bank-platform/loadgenerator:3a47664e5ad8b298f36d69f11743729fc24d9995
           name: loadgenerator
           resources:
             limits:

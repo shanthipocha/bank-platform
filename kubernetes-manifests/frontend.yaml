@@ -101,7 +101,7 @@ spec:
                 name: environment-config
             - configMapRef:
                 name: service-api-config
-          image: ghcr.io/shanthipocha/bank-platform/frontend:b35f93ef05bac173213ccd33a0d9324854dccb74
+          image: ghcr.io/shanthipocha/bank-platform/frontend:3a47664e5ad8b298f36d69f11743729fc24d9995
           livenessProbe:
             httpGet:
               path: /ready

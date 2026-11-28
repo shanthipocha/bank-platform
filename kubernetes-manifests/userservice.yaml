@@ -83,7 +83,7 @@ spec:
                 name: accounts-db-config
             - secretRef:
                 name: accounts-db-secret
-          image: ghcr.io/shanthipocha/bank-platform/userservice:b35f93ef05bac173213ccd33a0d9324854dccb74
+          image: ghcr.io/shanthipocha/bank-platform/userservice:3a47664e5ad8b298f36d69f11743729fc24d9995
           name: userservice
           ports:
             - containerPort: 8080
