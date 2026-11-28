@@ -20,6 +20,7 @@ alertmanager:
         - receiver: slack-critical
           matchers: ['severity="critical"']
           repeat_interval: 1h
+          group_wait: 10s
         - receiver: slack-warning
           matchers: ['severity="warning"']
     receivers:
