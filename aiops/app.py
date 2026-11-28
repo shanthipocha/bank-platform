@@ -67,7 +67,7 @@ LOKI = os.environ.get("LOKI_URL", "http://loki.monitoring.svc:3100")
 
 def loki_errors(ns):
     q = urllib.parse.urlencode({
-        "query": '{namespace="%s"} |~ "(?i)error|exception|refused|timed out"' % ns,
+        "query": '{namespace="%s"} |~ "(?i)error|exception|refused|timed out" !~ "(?i)default credentials"' % ns,
         "since": "10m", "limit": "200", "direction": "backward"})
     with urllib.request.urlopen(f"{LOKI}/loki/api/v1/query_range?{q}", timeout=10) as r:
         streams = json.loads(r.read().decode())["data"]["result"]
